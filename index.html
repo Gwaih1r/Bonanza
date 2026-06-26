@@ -1,0 +1,1643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0e1114">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>World Cup Bonanza</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0e1114;color:#d1d5db;font-family:'DM Sans',system-ui,sans-serif;-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
+input[type=number]{-moz-appearance:textfield}
+input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#2a2f38;border-radius:2px}
+#root{max-width:480px;margin:0 auto;min-height:100vh;padding-bottom:env(safe-area-inset-bottom)}
+</style>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script>
+const {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo
+} = React;
+const PLAYERS = ["Kyle", "Brent", "Gavin", "Brad"];
+const P_COLORS = {
+  Kyle: "#d4a843",
+  Brent: "#4e8be8",
+  Gavin: "#3d8b37",
+  Brad: "#c75a3a"
+};
+const T = {
+  MEX: {
+    n: "Mexico",
+    f: "🇲🇽",
+    g: "A",
+    o: "Kyle"
+  },
+  RSA: {
+    n: "South Africa",
+    f: "🇿🇦",
+    g: "A",
+    o: "Gavin"
+  },
+  KOR: {
+    n: "South Korea",
+    f: "🇰🇷",
+    g: "A",
+    o: "Brad"
+  },
+  CZE: {
+    n: "Czechia",
+    f: "🇨🇿",
+    g: "A",
+    o: "Brent"
+  },
+  BIH: {
+    n: "Bosnia & Herz.",
+    f: "🇧🇦",
+    g: "B",
+    o: "Kyle"
+  },
+  CAN: {
+    n: "Canada",
+    f: "🇨🇦",
+    g: "B",
+    o: "Gavin"
+  },
+  QAT: {
+    n: "Qatar",
+    f: "🇶🇦",
+    g: "B",
+    o: "Brad"
+  },
+  SUI: {
+    n: "Switzerland",
+    f: "🇨🇭",
+    g: "B",
+    o: "Brent"
+  },
+  BRA: {
+    n: "Brazil",
+    f: "🇧🇷",
+    g: "C",
+    o: "Brad"
+  },
+  HAI: {
+    n: "Haiti",
+    f: "🇭🇹",
+    g: "C",
+    o: "Kyle"
+  },
+  MAR: {
+    n: "Morocco",
+    f: "🇲🇦",
+    g: "C",
+    o: "Brent"
+  },
+  SCO: {
+    n: "Scotland",
+    f: "\ud83c\udff4\udb40\udc67\udb40\udc62\udb40\udc73\udb40\udc63\udb40\udc74\udb40\udc7f",
+    g: "C",
+    o: "Gavin"
+  },
+  USA: {
+    n: "USA",
+    f: "🇺🇸",
+    g: "D",
+    o: "Brent"
+  },
+  AUS: {
+    n: "Australia",
+    f: "🇦🇺",
+    g: "D",
+    o: "Brad"
+  },
+  PAR: {
+    n: "Paraguay",
+    f: "🇵🇾",
+    g: "D",
+    o: "Kyle"
+  },
+  TUR: {
+    n: "Turkiye",
+    f: "🇹🇷",
+    g: "D",
+    o: "Gavin"
+  },
+  GER: {
+    n: "Germany",
+    f: "🇩🇪",
+    g: "E",
+    o: "Brent"
+  },
+  CIV: {
+    n: "Ivory Coast",
+    f: "🇨🇮",
+    g: "E",
+    o: "Kyle"
+  },
+  ECU: {
+    n: "Ecuador",
+    f: "🇪🇨",
+    g: "E",
+    o: "Brad"
+  },
+  CUR: {
+    n: "Curacao",
+    f: "🇨🇼",
+    g: "E",
+    o: "Gavin"
+  },
+  NED: {
+    n: "Netherlands",
+    f: "🇳🇱",
+    g: "F",
+    o: "Kyle"
+  },
+  JPN: {
+    n: "Japan",
+    f: "🇯🇵",
+    g: "F",
+    o: "Gavin"
+  },
+  SWE: {
+    n: "Sweden",
+    f: "🇸🇪",
+    g: "F",
+    o: "Brent"
+  },
+  TUN: {
+    n: "Tunisia",
+    f: "🇹🇳",
+    g: "F",
+    o: "Brad"
+  },
+  EGY: {
+    n: "Egypt",
+    f: "🇪🇬",
+    g: "G",
+    o: "Kyle"
+  },
+  BEL: {
+    n: "Belgium",
+    f: "🇧🇪",
+    g: "G",
+    o: "Gavin"
+  },
+  IRN: {
+    n: "Iran",
+    f: "🇮🇷",
+    g: "G",
+    o: "Brad"
+  },
+  NZL: {
+    n: "New Zealand",
+    f: "🇳🇿",
+    g: "G",
+    o: "Brent"
+  },
+  ESP: {
+    n: "Spain",
+    f: "🇪🇸",
+    g: "H",
+    o: "Gavin"
+  },
+  URU: {
+    n: "Uruguay",
+    f: "🇺🇾",
+    g: "H",
+    o: "Brad"
+  },
+  CPV: {
+    n: "Cape Verde",
+    f: "🇨🇻",
+    g: "H",
+    o: "Brent"
+  },
+  KSA: {
+    n: "Saudi Arabia",
+    f: "🇸🇦",
+    g: "H",
+    o: "Kyle"
+  },
+  FRA: {
+    n: "France",
+    f: "🇫🇷",
+    g: "I",
+    o: "Kyle"
+  },
+  NOR: {
+    n: "Norway",
+    f: "🇳🇴",
+    g: "I",
+    o: "Gavin"
+  },
+  SEN: {
+    n: "Senegal",
+    f: "🇸🇳",
+    g: "I",
+    o: "Brad"
+  },
+  IRQ: {
+    n: "Iraq",
+    f: "🇮🇶",
+    g: "I",
+    o: "Brent"
+  },
+  ARG: {
+    n: "Argentina",
+    f: "🇦🇷",
+    g: "J",
+    o: "Brad"
+  },
+  AUT: {
+    n: "Austria",
+    f: "🇦🇹",
+    g: "J",
+    o: "Gavin"
+  },
+  ALG: {
+    n: "Algeria",
+    f: "🇩🇿",
+    g: "J",
+    o: "Brent"
+  },
+  JOR: {
+    n: "Jordan",
+    f: "🇯🇴",
+    g: "J",
+    o: "Kyle"
+  },
+  COL: {
+    n: "Colombia",
+    f: "🇨🇴",
+    g: "K",
+    o: "Kyle"
+  },
+  POR: {
+    n: "Portugal",
+    f: "🇵🇹",
+    g: "K",
+    o: "Brent"
+  },
+  COD: {
+    n: "DR Congo",
+    f: "🇨🇩",
+    g: "K",
+    o: "Gavin"
+  },
+  UZB: {
+    n: "Uzbekistan",
+    f: "🇺🇿",
+    g: "K",
+    o: "Brad"
+  },
+  ENG: {
+    n: "England",
+    f: "\ud83c\udff4\udb40\udc67\udb40\udc62\udb40\udc65\udb40\udc6e\udb40\udc67\udb40\udc7f",
+    g: "L",
+    o: "Kyle"
+  },
+  CRO: {
+    n: "Croatia",
+    f: "🇭🇷",
+    g: "L",
+    o: "Gavin"
+  },
+  GHA: {
+    n: "Ghana",
+    f: "🇬🇭",
+    g: "L",
+    o: "Brad"
+  },
+  PAN: {
+    n: "Panama",
+    f: "🇵🇦",
+    g: "L",
+    o: "Brent"
+  }
+};
+const GROUPS = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"];
+const INIT_MATCHES = [["A1", "Jun 11", "MEX", 2, 0, "RSA", "A", 1], ["A2", "Jun 11", "KOR", 2, 1, "CZE", "A", 1], ["B1", "Jun 12", "CAN", 1, 1, "BIH", "B", 1], ["D1", "Jun 12", "USA", 4, 1, "PAR", "D", 1], ["C1", "Jun 13", "HAI", 0, 1, "SCO", "C", 1], ["D2", "Jun 13", "AUS", 2, 0, "TUR", "D", 1], ["C2", "Jun 13", "BRA", 1, 1, "MAR", "C", 1], ["B2", "Jun 13", "QAT", 1, 1, "SUI", "B", 1], ["E1", "Jun 14", "CIV", 1, 0, "ECU", "E", 1], ["E2", "Jun 14", "GER", 7, 1, "CUR", "E", 1], ["F1", "Jun 14", "NED", 2, 2, "JPN", "F", 1], ["F2", "Jun 14", "SWE", 5, 1, "TUN", "F", 1], ["H1", "Jun 15", "KSA", 1, 1, "URU", "H", 1], ["H2", "Jun 15", "ESP", 0, 0, "CPV", "H", 1], ["G1", "Jun 15", "IRN", 2, 2, "NZL", "G", 1], ["G2", "Jun 15", "BEL", 1, 1, "EGY", "G", 1], ["I1", "Jun 16", "FRA", 3, 1, "SEN", "I", 1], ["I2", "Jun 16", "IRQ", 1, 3, "NOR", "I", 1], ["J1", "Jun 16", "ARG", 3, 0, "ALG", "J", 1], ["J2", "Jun 16", "AUT", 3, 1, "JOR", "J", 1], ["L1", "Jun 17", "GHA", 1, 0, "PAN", "L", 1], ["L2", "Jun 17", "ENG", 4, 2, "CRO", "L", 1], ["K1", "Jun 17", "POR", 1, 1, "COD", "K", 1], ["K2", "Jun 17", "UZB", 1, 3, "COL", "K", 1], ["A3", "Jun 18", "CZE", 1, 1, "RSA", "A", 2], ["B3", "Jun 18", "SUI", 4, 1, "BIH", "B", 2], ["B4", "Jun 18", "CAN", 6, 0, "QAT", "B", 2], ["A4", "Jun 18", "MEX", 1, 0, "KOR", "A", 2], ["C3", "Jun 19", "BRA", 3, 0, "HAI", "C", 2], ["C4", "Jun 19", "SCO", 0, 1, "MAR", "C", 2], ["D3", "Jun 19", "TUR", 0, 1, "PAR", "D", 2], ["D4", "Jun 19", "USA", 2, 0, "AUS", "D", 2], ["E3", "Jun 20", "GER", 2, 1, "CIV", "E", 2], ["E4", "Jun 20", "ECU", 0, 0, "CUR", "E", 2], ["F3", "Jun 20", "NED", 5, 1, "SWE", "F", 2], ["F4", "Jun 20", "TUN", 0, 4, "JPN", "F", 2], ["H3", "Jun 21", "URU", 2, 2, "CPV", "H", 2], ["H4", "Jun 21", "ESP", 4, 0, "KSA", "H", 2], ["G3", "Jun 21", "BEL", 0, 0, "IRN", "G", 2], ["G4", "Jun 21", "NZL", 1, 3, "EGY", "G", 2], ["I3", "Jun 22", "NOR", 3, 2, "SEN", "I", 2], ["I4", "Jun 22", "FRA", 3, 0, "IRQ", "I", 2], ["J3", "Jun 22", "ARG", 2, 0, "AUT", "J", 2], ["J4", "Jun 22", "JOR", 1, 2, "ALG", "J", 2], ["L3", "Jun 23", "ENG", 0, 0, "GHA", "L", 2], ["L4", "Jun 23", "PAN", 0, 1, "CRO", "L", 2], ["K3", "Jun 23", "POR", 5, 0, "UZB", "K", 2], ["K4", "Jun 23", "COL", 1, 0, "COD", "K", 2], ["C5", "Jun 24", "SCO", 0, 3, "BRA", "C", 3], ["C6", "Jun 24", "MAR", 4, 2, "HAI", "C", 3], ["B5", "Jun 24", "SUI", 2, 1, "CAN", "B", 3], ["B6", "Jun 24", "BIH", 3, 1, "QAT", "B", 3], ["A5", "Jun 24", "CZE", 0, 3, "MEX", "A", 3], ["A6", "Jun 24", "RSA", 1, 0, "KOR", "A", 3], ["E5", "Jun 25", "CUR", null, null, "CIV", "E", 3], ["E6", "Jun 25", "ECU", null, null, "GER", "E", 3], ["F5", "Jun 25", "JPN", null, null, "SWE", "F", 3], ["F6", "Jun 25", "TUN", null, null, "NED", "F", 3], ["D5", "Jun 25", "TUR", null, null, "USA", "D", 3], ["D6", "Jun 25", "PAR", null, null, "AUS", "D", 3], ["I5", "Jun 26", "NOR", null, null, "FRA", "I", 3], ["I6", "Jun 26", "SEN", null, null, "IRQ", "I", 3], ["G5", "Jun 26", "EGY", null, null, "IRN", "G", 3], ["G6", "Jun 26", "NZL", null, null, "BEL", "G", 3], ["H5", "Jun 26", "CPV", null, null, "KSA", "H", 3], ["H6", "Jun 26", "URU", null, null, "ESP", "H", 3], ["L5", "Jun 27", "PAN", null, null, "ENG", "L", 3], ["L6", "Jun 27", "CRO", null, null, "GHA", "L", 3], ["J5", "Jun 27", "ALG", null, null, "AUT", "J", 3], ["J6", "Jun 27", "JOR", null, null, "ARG", "J", 3], ["K5", "Jun 27", "COL", null, null, "POR", "K", 3], ["K6", "Jun 27", "COD", null, null, "UZB", "K", 3]];
+const COMBO_RAW = "ABCDEFGHHGBCAFDEABCDEFGICGBDAFEIABCDEFGJCGBDAFEJABCDEFGKCGBDAFEKABCDEFGLCGBDAFLEABCDEFHIHEBCAFDIABCDEFHJHJBCAFDEABCDEFHKHEBCAFDKABCDEFHLHFBCADLEABCDEFIJCJBDAFEIABCDEFIKCEBDAFIKABCDEFILCEBDAFLIABCDEFJKCJBDAFEKABCDEFJLCJBDAFLEABCDEFKLCEBDAFLKABCDEGHIHGBCADEIABCDEGHJHGBCADEJABCDEGHKHGBCADEKABCDEGHLHGBCADLEABCDEGIJEGBCADIJABCDEGIKEGBCADIKABCDEGILEGBCADLIABCDEGJKEGBCADJKABCDEGJLEGBCADLJABCDEGKLEGBCADLKABCDEHIJHJBCADEIABCDEHIKHEBCADIKABCDEHILHEBCADLIABCDEHJKHJBCADEKABCDEHJLHJBCADLEABCDEHKLHEBCADLKABCDEIJKEJBCADIKABCDEIJLEJBCADLIABCDEIKLEIBCADLKABCDEJKLEJBCADLKABCDFGHIHGBCAFDIABCDFGHJHGBCAFDJABCDFGHKHGBCAFDKABCDFGHLCGBDAFLHABCDFGIJCGBDAFIJABCDFGIKCGBDAFIKABCDFGILCGBDAFLIABCDFGJKCGBDAFJKABCDFGJLCGBDAFLJABCDFGKLCGBDAFLKABCDFHIJHJBCAFDIABCDFHIKHFBCADIKABCDFHILHFBCADLIABCDFHJKHJBCAFDKABCDFHJLCJBDAFLHABCDFHKLHFBCADLKABCDFIJKCJBDAFIKABCDFIJLCJBDAFLIABCDFIKLCIBDAFLKABCDFJKLCJBDAFLKABCDGHIJHGBCADIJABCDGHIKHGBCADIKABCDGHILHGBCADLIABCDGHJKHGBCADJKABCDGHJLHGBCADLJABCDGHKLHGBCADLKABCDGIJKCJBDAGIKABCDGIJLCJBDAGLIABCDGIKLIGBCADLKABCDGJKLCJBDAGLKABCDHIJKHJBCADIKABCDHIJLHJBCADLIABCDHIKLHIBCADLKABCDHJKLHJBCADLKABCDIJKLIJBCADLKABCEFGHIHGBCAFEIABCEFGHJHGBCAFEJABCEFGHKHGBCAFEKABCEFGHLHGBCAFLEABCEFGIJEGBCAFIJABCEFGIKEGBCAFIKABCEFGILEGBCAFLIABCEFGJKEGBCAFJKABCEFGJLEGBCAFLJABCEFGKLEGBCAFLKABCEFHIJHJBCAFEIABCEFHIKHEBCAFIKABCEFHILHEBCAFLIABCEFHJKHJBCAFEKABCEFHJLHJBCAFLEABCEFHKLHEBCAFLKABCEFIJKEJBCAFIKABCEFIJLEJBCAFLIABCEFIKLEIBCAFLKABCEFJKLEJBCAFLKABCEGHIJHJBCAGEIABCEGHIKEGBCAHIKABCEGHILEGBCAHLIABCEGHJKHJBCAGEKABCEGHJLHJBCAGLEABCEGHKLEGBCAHLKABCEGIJKEJBCAGIKABCEGIJLEJBCAGLIABCEGIKLEGBAICLKABCEGJKLEJBCAGLKABCEHIJKEJBCAHIKABCEHIJLEJBCAHLIABCEHIKLEIBCAHLKABCEHJKLEJBCAHLKABCEIJKLEJBAICLKABCFGHIJHGBCAFIJABCFGHIKHGBCAFIKABCFGHILHGBCAFLIABCFGHJKHGBCAFJKABCFGHJLHGBCAFLJABCFGHKLHGBCAFLKABCFGIJKCJBFAGIKABCFGIJLCJBFAGLIABCFGIKLIGBCAFLKABCFGJKLCJBFAGLKABCFHIJKHJBCAFIKABCFHIJLHJBCAFLIABCFHIKLHIBCAFLKABCFHJKLHJBCAFLKABCFIJKLIJBCAFLKABCGHIJKHJBCAGIKABCGHIJLHJBCAGLIABCGHIKLIGBCAHLKABCGHJKLHJBCAGLKABCGIJKLIJBCAGLKABCHIJKLIJBCAHLKABDEFGHIHGBDAFEIABDEFGHJHGBDAFEJABDEFGHKHGBDAFEKABDEFGHLHGBDAFLEABDEFGIJEGBDAFIJABDEFGIKEGBDAFIKABDEFGILEGBDAFLIABDEFGJKEGBDAFJKABDEFGJLEGBDAFLJABDEFGKLEGBDAFLKABDEFHIJHJBDAFEIABDEFHIKHEBDAFIKABDEFHILHEBDAFLIABDEFHJKHJBDAFEKABDEFHJLHJBDAFLEABDEFHKLHEBDAFLKABDEFIJKEJBDAFIKABDEFIJLEJBDAFLIABDEFIKLEIBDAFLKABDEFJKLEJBDAFLKABDEGHIJHJBDAGEIABDEGHIKEGBDAHIKABDEGHILEGBDAHLIABDEGHJKHJBDAGEKABDEGHJLHJBDAGLEABDEGHKLEGBDAHLKABDEGIJKEJBDAGIKABDEGIJLEJBDAGLIABDEGIKLEGBAIDLKABDEGJKLEJBDAGLKABDEHIJKEJBDAHIKABDEHIJLEJBDAHLIABDEHIKLEIBDAHLKABDEHJKLEJBDAHLKABDEIJKLEJBAIDLKABDFGHIJHGBDAFIJABDFGHIKHGBDAFIKABDFGHILHGBDAFLIABDFGHJKHGBDAFJKABDFGHJLHGBDAFLJABDFGHKLHGBDAFLKABDFGIJKFJBDAGIKABDFGIJLFJBDAGLIABDFGIKLIGBDAFLKABDFGJKLFJBDAGLKABDFHIJKHJBDAFIKABDFHIJLHJBDAFLIABDFHIKLHIBDAFLKABDFHJKLHJBDAFLKABDFIJKLIJBDAFLKABDGHIJKHJBDAGIKABDGHIJLHJBDAGLIABDGHIKLIGBDAHLKABDGHJKLHJBDAGLKABDGIJKLIJBDAGLKABDHIJKLIJBDAHLKABEFGHIJHJBFAGEIABEFGHIKEGBFAHIKABEFGHILEGBFAHLIABEFGHJKHJBFAGEKABEFGHJLHJBFAGLEABEFGHKLEGBFAHLKABEFGIJKEJBFAGIKABEFGIJLEJBFAGLIABEFGIKLEGBAIFLKABEFGJKLEJBFAGLKABEFHIJKEJBFAHIKABEFHIJLEJBFAHLIABEFHIKLEIBFAHLKABEFHJKLEJBFAHLKABEFIJKLEJBAIFLKABEGHIJKEJBAHGIKABEGHIJLEJBAHGLIABEGHIKLEGBAIHLKABEGHJKLEJBAHGLKABEGIJKLEJBAIGLKABEHIJKLEJBAIHLKABFGHIJKHJBFAGIKABFGHIJLHJBFAGLIABFGHIKLHGBAIFLKABFGHJKLHJBFAGLKABFGIJKLIJBFAGLKABFHIJKLHJBAIFLKABGHIJKLHJBAIGLKACDEFGHIHGECAFDIACDEFGHJHGJCAFDEACDEFGHKHGECAFDKACDEFGHLHGFCADLEACDEFGIJCGJDAFEIACDEFGIKCGEDAFIKACDEFGILCGEDAFLIACDEFGJKCGJDAFEKACDEFGJLCGJDAFLEACDEFGKLCGEDAFLKACDEFHIJHJECAFDIACDEFHIKHEFCADIKACDEFHILHEFCADLIACDEFHJKHJECAFDKACDEFHJLHJFCADLEACDEFHKLHEFCADLKACDEFIJKCJEDAFIKACDEFIJLCJEDAFLIACDEFIKLCEIDAFLKACDEFJKLCJEDAFLKACDEGHIJHGJCADEIACDEGHIKHGECADIKACDEGHILHGECADLIACDEGHJKHGJCADEKACDEGHJLHGJCADLEACDEGHKLHGECADLKACDEGIJKEGJCADIKACDEGIJLEGJCADLIACDEGIKLEGICADLKACDEGJKLEGJCADLKACDEHIJKHJECADIKACDEHIJLHJECADLIACDEHIKLHEICADLKACDEHJKLHJECADLKACDEIJKLEJICADLKACDFGHIJHGJCAFDIACDFGHIKHGFCADIKACDFGHILHGFCADLIACDFGHJKHGJCAFDKACDFGHJLCGJDAFLHACDFGHKLHGFCADLKACDFGIJKCGJDAFIKACDFGIJLCGJDAFLIACDFGIKLCGIDAFLKACDFGJKLCGJDAFLKACDFHIJKHJFCADIKACDFHIJLHJFCADLIACDFHIKLHFICADLKACDFHJKLHJFCADLKACDFIJKLCJIDAFLKACDGHIJKHGJCADIKACDGHIJLHGJCADLIACDGHIKLHGICADLKACDGHJKLHGJCADLKACDGIJKLIGJCADLKACDHIJKLHJICADLKACEFGHIJHGJCAFEIACEFGHIKHGECAFIKACEFGHILHGECAFLIACEFGHJKHGJCAFEKACEFGHJLHGJCAFLEACEFGHKLHGECAFLKACEFGIJKEGJCAFIKACEFGIJLEGJCAFLIACEFGIKLEGICAFLKACEFGJKLEGJCAFLKACEFHIJKHJECAFIKACEFHIJLHJECAFLIACEFHIKLHEICAFLKACEFHJKLHJECAFLKACEFIJKLEJICAFLKACEGHIJKEGJCAHIKACEGHIJLEGJCAHLIACEGHIKLEGICAHLKACEGHJKLEGJCAHLKACEGIJKLEJICAGLKACEHIJKLEJICAHLKACFGHIJKHGJCAFIKACFGHIJLHGJCAFLIACFGHIKLHGICAFLKACFGHJKLHGJCAFLKACFGIJKLIGJCAFLKACFHIJKLHJICAFLKACGHIJKLHJICAGLKADEFGHIJHGJDAFEIADEFGHIKHGEDAFIKADEFGHILHGEDAFLIADEFGHJKHGJDAFEKADEFGHJLHGJDAFLEADEFGHKLHGEDAFLKADEFGIJKEGJDAFIKADEFGIJLEGJDAFLIADEFGIKLEGIDAFLKADEFGJKLEGJDAFLKADEFHIJKHJEDAFIKADEFHIJLHJEDAFLIADEFHIKLHEIDAFLKADEFHJKLHJEDAFLKADEFIJKLEJIDAFLKADEGHIJKEGJDAHIKADEGHIJLEGJDAHLIADEGHIKLEGIDAHLKADEGHJKLEGJDAHLKADEGIJKLEJIDAGLKADEHIJKLEJIDAHLKADFGHIJKHGJDAFIKADFGHIJLHGJDAFLIADFGHIKLHGIDAFLKADFGHJKLHGJDAFLKADFGIJKLIGJDAFLKADFHIJKLHJIDAFLKADGHIJKLHJIDAGLKAEFGHIJKEGJFAHIKAEFGHIJLEGJFAHLIAEFGHIKLEGIFAHLKAEFGHJKLEGJFAHLKAEFGIJKLEJIFAGLKAEFHIJKLEJIFAHLKAEGHIJKLEJIAHGLKAFGHIJKLHJIFAGLKBCDEFGHICGBDHFEIBCDEFGHJHGBCJFDEBCDEFGHKCGBDHFEKBCDEFGHLCGBDHFLEBCDEFGIJCGBDJFEIBCDEFGIKCGBDEFIKBCDEFGILCGBDEFLIBCDEFGJKCGBDJFEKBCDEFGJLCGBDJFLEBCDEFGKLCGBDEFLKBCDEFHIJCJBDHFEIBCDEFHIKCEBDHFIKBCDEFHILCEBDHFLIBCDEFHJKCJBDHFEKBCDEFHJLCJBDHFLEBCDEFHKLCEBDHFLKBCDEFIJKCJBDEFIKBCDEFIJLCJBDEFLIBCDEFIKLCEBDIFLKBCDEFJKLCJBDEFLKBCDEGHIJHGBCJDEIBCDEGHIKEGBCHDIKBCDEGHILEGBCHDLIBCDEGHJKHGBCJDEKBCDEGHJLHGBCJDLEBCDEGHKLEGBCHDLKBCDEGIJKEGBCJDIKBCDEGIJLEGBCJDLIBCDEGIKLEGBCIDLKBCDEGJKLEGBCJDLKBCDEHIJKEJBCHDIKBCDEHIJLEJBCHDLIBCDEHIKLEIBCHDLKBCDEHJKLEJBCHDLKBCDEIJKLEJBCIDLKBCDFGHIJHGBCJFDIBCDFGHIKCGBDHFIKBCDFGHILCGBDHFLIBCDFGHJKHGBCJFDKBCDFGHJLCGBDHFLJBCDFGHKLCGBDHFLKBCDFGIJKCGBDJFIKBCDFGIJLCGBDJFLIBCDFGIKLCGBDIFLKBCDFGJKLCGBDJFLKBCDFHIJKCJBDHFIKBCDFHIJLCJBDHFLIBCDFHIKLCIBDHFLKBCDFHJKLCJBDHFLKBCDFIJKLCJBDIFLKBCDGHIJKHGBCJDIKBCDGHIJLHGBCJDLIBCDGHIKLHGBCIDLKBCDGHJKLHGBCJDLKBCDGIJKLIGBCJDLKBCDHIJKLHJBCIDLKBCEFGHIJHGBCJFEIBCEFGHIKEGBCHFIKBCEFGHILEGBCHFLIBCEFGHJKHGBCJFEKBCEFGHJLHGBCJFLEBCEFGHKLEGBCHFLKBCEFGIJKEGBCJFIKBCEFGIJLEGBCJFLIBCEFGIKLEGBCIFLKBCEFGJKLEGBCJFLKBCEFHIJKEJBCHFIKBCEFHIJLEJBCHFLIBCEFHIKLEIBCHFLKBCEFHJKLEJBCHFLKBCEFIJKLEJBCIFLKBCEGHIJKEJBCHGIKBCEGHIJLEJBCHGLIBCEGHIKLEGBCIHLKBCEGHJKLEJBCHGLKBCEGIJKLEJBCIGLKBCEHIJKLEJBCIHLKBCFGHIJKHGBCJFIKBCFGHIJLHGBCJFLIBCFGHIKLHGBCIFLKBCFGHJKLHGBCJFLKBCFGIJKLIGBCJFLKBCFHIJKLHJBCIFLKBCGHIJKLHJBCIGLKBDEFGHIJHGBDJFEIBDEFGHIKEGBDHFIKBDEFGHILEGBDHFLIBDEFGHJKHGBDJFEKBDEFGHJLHGBDJFLEBDEFGHKLEGBDHFLKBDEFGIJKEGBDJFIKBDEFGIJLEGBDJFLIBDEFGIKLEGBDIFLKBDEFGJKLEGBDJFLKBDEFHIJKEJBDHFIKBDEFHIJLEJBDHFLIBDEFHIKLEIBDHFLKBDEFHJKLEJBDHFLKBDEFIJKLEJBDIFLKBDEGHIJKEJBDHGIKBDEGHIJLEJBDHGLIBDEGHIKLEGBDIHLKBDEGHJKLEJBDHGLKBDEGIJKLEJBDIGLKBDEHIJKLEJBDIHLKBDFGHIJKHGBDJFIKBDFGHIJLHGBDJFLIBDFGHIKLHGBDIFLKBDFGHJKLHGBDJFLKBDFGIJKLIGBDJFLKBDFHIJKLHJBDIFLKBDGHIJKLHJBDIGLKBEFGHIJKEJBFHGIKBEFGHIJLEJBFHGLIBEFGHIKLEGBFIHLKBEFGHJKLEJBFHGLKBEFGIJKLEJBFIGLKBEFHIJKLEJBFIHLKBEGHIJKLEJIBHGLKBFGHIJKLHJBFIGLKCDEFGHIJCGJDHFEICDEFGHIKCGEDHFIKCDEFGHILCGEDHFLICDEFGHJKCGJDHFEKCDEFGHJLCGJDHFLECDEFGHKLCGEDHFLKCDEFGIJKCGEDJFIKCDEFGIJLCGEDJFLICDEFGIKLCGEDIFLKCDEFGJKLCGEDJFLKCDEFHIJKCJEDHFIKCDEFHIJLCJEDHFLICDEFHIKLCEIDHFLKCDEFHJKLCJEDHFLKCDEFIJKLCJEDIFLKCDEGHIJKEGJCHDIKCDEGHIJLEGJCHDLICDEGHIKLEGICHDLKCDEGHJKLEGJCHDLKCDEGIJKLEGICJDLKCDEHIJKLEJICHDLKCDFGHIJKCGJDHFIKCDFGHIJLCGJDHFLICDFGHIKLCGIDHFLKCDFGHJKLCGJDHFLKCDFGIJKLCGIDJFLKCDFHIJKLCJIDHFLKCDGHIJKLHGICJDLKCEFGHIJKEGJCHFIKCEFGHIJLEGJCHFLICEFGHIKLEGICHFLKCEFGHJKLEGJCHFLKCEFGIJKLEGICJFLKCEFHIJKLEJICHFLKCEGHIJKLEJICHGLKCFGHIJKLHGICJFLKDEFGHIJKEGJDHFIKDEFGHIJLEGJDHFLIDEFGHIKLEGIDHFLKDEFGHJKLEGJDHFLKDEFGIJKLEGIDJFLKDEFHIJKLEJIDHFLKDEGHIJKLEJIDHGLKDFGHIJKLHGIDJFLKEFGHIJKLEJIFHGLK";
+const COMBO_TABLE = {};
+for (let i = 0; i < COMBO_RAW.length; i += 16) COMBO_TABLE[COMBO_RAW.slice(i, i + 8)] = COMBO_RAW.slice(i + 8, i + 16);
+const R32_STRUCTURE = [["R32-1", "1v3", "E", 3], ["R32-2", "1v3", "I", 5], ["R32-3", "2v2", "A", "B"], ["R32-4", "1v2", "F", "C"], ["R32-5", "2v2", "K", "L"], ["R32-6", "1v2", "H", "J"], ["R32-7", "1v3", "D", 2], ["R32-8", "1v3", "G", 4], ["R32-9", "1v2", "C", "F"], ["R32-10", "2v2", "E", "I"], ["R32-11", "1v3", "A", 0], ["R32-12", "1v3", "L", 7], ["R32-13", "1v2", "J", "H"], ["R32-14", "2v2", "D", "G"], ["R32-15", "1v3", "B", 1], ["R32-16", "1v3", "K", 6]];
+const R16P = [[0, 1], [2, 3], [4, 5], [6, 7], [8, 9], [10, 11], [12, 13], [14, 15]];
+const QFP = [[0, 1], [2, 3], [4, 5], [6, 7]];
+const SFP = [[0, 1], [2, 3]];
+const SK = "wc-bonanza-2026";
+const S = {
+  mono: "'Space Mono',monospace",
+  bg: "#0e1114",
+  card: "#13161b",
+  bdr: "#1a1d22",
+  p: "#e8e6e1",
+  s: "#8b8f96",
+  m: "#6b7280",
+  d: "#4a4f58",
+  gold: "#d4a843",
+  grn: "#3d8b37",
+  red: "#c75a3a"
+};
+function loadData() {
+  try {
+    const r = localStorage.getItem(SK);
+    return r ? JSON.parse(r) : null;
+  } catch {
+    return null;
+  }
+}
+function saveData(sc, ko, ks) {
+  try {
+    localStorage.setItem(SK, JSON.stringify({
+      scores: sc,
+      ko,
+      koScores: ks
+    }));
+  } catch {}
+}
+function calcStandings(matches) {
+  const g = {};
+  GROUPS.forEach(gr => {
+    g[gr] = {};
+  });
+  Object.entries(T).forEach(([c, t]) => {
+    g[t.g][c] = {
+      w: 0,
+      d: 0,
+      l: 0,
+      gf: 0,
+      ga: 0,
+      pts: 0
+    };
+  });
+  matches.forEach(m => {
+    const [,, t1, s1, s2, t2, gr] = m;
+    if (s1 === null || s2 === null) return;
+    const a = g[gr][t1],
+      b = g[gr][t2];
+    a.gf += s1;
+    a.ga += s2;
+    b.gf += s2;
+    b.ga += s1;
+    if (s1 > s2) {
+      a.w++;
+      a.pts += 3;
+      b.l++;
+    } else if (s1 < s2) {
+      b.w++;
+      b.pts += 3;
+      a.l++;
+    } else {
+      a.d++;
+      a.pts++;
+      b.d++;
+      b.pts++;
+    }
+  });
+  const sorted = {};
+  GROUPS.forEach(gr => {
+    sorted[gr] = Object.entries(g[gr]).map(([c, s]) => ({
+      code: c,
+      ...s,
+      gd: s.gf - s.ga
+    })).sort((a, b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf);
+  });
+  return sorted;
+}
+function calc3rd(standings) {
+  const thirds = GROUPS.map(gr => {
+    const s = standings[gr];
+    return s.length >= 3 ? {
+      ...s[2],
+      group: gr
+    } : null;
+  }).filter(Boolean).sort((a, b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf);
+  const adv = thirds.slice(0, 8);
+  const key = adv.map(t => t.group).sort().join("");
+  return {
+    thirds,
+    advancing: adv,
+    advGroups: key,
+    comboValues: COMBO_TABLE[key] || null
+  };
+}
+function calcR32(standings, combo) {
+  return R32_STRUCTURE.map(([id, type, p1, p2]) => {
+    let t1 = null,
+      t2 = null;
+    if (type === "1v3") {
+      t1 = standings[p1]?.[0]?.code || null;
+      if (combo) {
+        t2 = standings[combo[p2]]?.[2]?.code || null;
+      }
+    } else if (type === "1v2") {
+      t1 = standings[p1]?.[0]?.code || null;
+      t2 = standings[p2]?.[1]?.code || null;
+    } else {
+      t1 = standings[p1]?.[1]?.code || null;
+      t2 = standings[p2]?.[1]?.code || null;
+    }
+    return [id, t1, t2];
+  });
+}
+function getKOMatchups(round, r32, koR) {
+  if (round === "R32") return r32;
+  const prev = round === "R16" ? r32 : round === "QF" ? getKOMatchups("R16", r32, koR) : round === "SF" ? getKOMatchups("QF", r32, koR) : getKOMatchups("SF", r32, koR);
+  if (round === "3RD") {
+    const l1 = prev[0] && koR[prev[0][0]] ? koR[prev[0][0]] === prev[0][1] ? prev[0][2] : prev[0][1] : null;
+    const l2 = prev[1] && koR[prev[1][0]] ? koR[prev[1][0]] === prev[1][1] ? prev[1][2] : prev[1][1] : null;
+    return [["3RD-1", l1, l2]];
+  }
+  const pairs = round === "R16" ? R16P : round === "QF" ? QFP : round === "SF" ? SFP : [[0, 1]];
+  return pairs.map(([a, b], i) => [`${round}-${i + 1}`, prev[a] ? koR[prev[a][0]] || null : null, prev[b] ? koR[prev[b][0]] || null : null]);
+}
+function KOMatch({
+  mid,
+  t1,
+  t2,
+  koR,
+  koS,
+  onWin
+}) {
+  const [isEd, setEd] = useState(false);
+  const [es, setEs] = useState([0, 0]);
+  const w = koR[mid];
+  const tm1 = t1 ? T[t1] : null,
+    tm2 = t2 ? T[t2] : null;
+  const sc = koS[mid];
+  const hs = sc && sc[0] !== null;
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: S.card,
+      borderRadius: 6,
+      marginBottom: 6,
+      border: "1px solid " + S.bdr
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      padding: "10px 12px",
+      cursor: tm1 && tm2 && !isEd ? "pointer" : "default",
+      opacity: !tm1 || !tm2 ? 0.4 : 1
+    },
+    onClick: () => {
+      if (tm1 && tm2 && !isEd) {
+        setEd(true);
+        setEs(hs ? [sc[0], sc[1]] : [0, 0]);
+      }
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: 1,
+      display: "flex",
+      alignItems: "center",
+      gap: 6
+    }
+  }, tm1 ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 18
+    }
+  }, tm1.f), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 13,
+      fontWeight: w === t1 ? 700 : 400,
+      color: w === t1 ? S.gold : w ? S.d : "#c5c9cf"
+    }
+  }, t1)) : /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 12,
+      color: S.d
+    }
+  }, "TBD")), hs ? /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: S.mono,
+      fontSize: 16,
+      fontWeight: 700,
+      color: S.p,
+      minWidth: 48,
+      textAlign: "center"
+    }
+  }, sc[0], " – ", sc[1]) : /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      color: S.d,
+      minWidth: 48,
+      textAlign: "center",
+      fontFamily: S.mono
+    }
+  }, "vs"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: 1,
+      display: "flex",
+      alignItems: "center",
+      gap: 6,
+      justifyContent: "flex-end"
+    }
+  }, tm2 ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 13,
+      fontWeight: w === t2 ? 700 : 400,
+      color: w === t2 ? S.gold : w ? S.d : "#c5c9cf"
+    }
+  }, t2), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 18
+    }
+  }, tm2.f)) : /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 12,
+      color: S.d
+    }
+  }, "TBD"))), isEd && tm1 && tm2 && /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "0 12px 10px"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 8,
+      justifyContent: "center",
+      marginBottom: 8
+    }
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    min: 0,
+    max: 20,
+    value: es[0],
+    onChange: e => setEs([parseInt(e.target.value) || 0, es[1]]),
+    style: {
+      width: 40,
+      height: 34,
+      textAlign: "center",
+      background: "#252a33",
+      border: "1px solid #3a3f48",
+      borderRadius: 4,
+      color: S.p,
+      fontSize: 16,
+      fontWeight: 700,
+      fontFamily: S.mono
+    },
+    autoFocus: true
+  }), /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: S.d
+    }
+  }, "–"), /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    min: 0,
+    max: 20,
+    value: es[1],
+    onChange: e => setEs([es[0], parseInt(e.target.value) || 0]),
+    style: {
+      width: 40,
+      height: 34,
+      textAlign: "center",
+      background: "#252a33",
+      border: "1px solid #3a3f48",
+      borderRadius: 4,
+      color: S.p,
+      fontSize: 16,
+      fontWeight: 700,
+      fontFamily: S.mono
+    }
+  })), es[0] === es[1] && /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      color: S.m,
+      textAlign: "center",
+      marginBottom: 8
+    }
+  }, "Tap the winner (penalties)"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 6,
+      justifyContent: "center",
+      flexWrap: "wrap"
+    }
+  }, es[0] !== es[1] ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("button", {
+    onClick: () => setEd(false),
+    style: {
+      padding: "6px 14px",
+      borderRadius: 4,
+      border: "1px solid #2a2f38",
+      background: "transparent",
+      color: S.s,
+      fontSize: 12,
+      cursor: "pointer",
+      fontFamily: "inherit"
+    }
+  }, "Cancel"), /*#__PURE__*/React.createElement("button", {
+    onClick: () => {
+      onWin(mid, es[0] > es[1] ? t1 : t2, es[0], es[1], t1, t2);
+      setEd(false);
+    },
+    style: {
+      padding: "6px 14px",
+      borderRadius: 4,
+      border: "none",
+      background: S.gold,
+      color: S.bg,
+      fontSize: 12,
+      fontWeight: 600,
+      cursor: "pointer",
+      fontFamily: "inherit"
+    }
+  }, "Save")) : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("button", {
+    onClick: () => setEd(false),
+    style: {
+      padding: "6px 12px",
+      borderRadius: 4,
+      border: "1px solid #2a2f38",
+      background: "transparent",
+      color: S.s,
+      fontSize: 11,
+      cursor: "pointer",
+      fontFamily: "inherit"
+    }
+  }, "Cancel"), /*#__PURE__*/React.createElement("button", {
+    onClick: () => {
+      onWin(mid, t1, es[0], es[1], t1, t2);
+      setEd(false);
+    },
+    style: {
+      padding: "6px 12px",
+      borderRadius: 4,
+      border: "none",
+      background: P_COLORS[tm1.o],
+      color: "#fff",
+      fontSize: 11,
+      fontWeight: 600,
+      cursor: "pointer",
+      fontFamily: "inherit"
+    }
+  }, tm1.f, " wins"), /*#__PURE__*/React.createElement("button", {
+    onClick: () => {
+      onWin(mid, t2, es[0], es[1], t1, t2);
+      setEd(false);
+    },
+    style: {
+      padding: "6px 12px",
+      borderRadius: 4,
+      border: "none",
+      background: P_COLORS[tm2.o],
+      color: "#fff",
+      fontSize: 11,
+      fontWeight: 600,
+      cursor: "pointer",
+      fontFamily: "inherit"
+    }
+  }, tm2.f, " wins")))), w && !isEd && /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "0 12px 6px",
+      fontSize: 10,
+      color: S.gold,
+      fontFamily: S.mono
+    }
+  }, "▸ ", T[w].f, " ", T[w].n, " advance"));
+}
+function BracketTab({
+  r32,
+  koR,
+  koS,
+  onWin,
+  tpi
+}) {
+  const [round, setRound] = useState("R32");
+  const rk = ["R32", "R16", "QF", "SF", "F", "3RD"];
+  const lb = {
+    R32: "Round of 32",
+    R16: "Round of 16",
+    QF: "Quarterfinals",
+    SF: "Semifinals",
+    F: "Final",
+    "3RD": "3rd Place"
+  };
+  const cur = getKOMatchups(round, r32, koR);
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 0,
+      margin: "16px 0 4px",
+      overflowX: "auto",
+      borderBottom: "1px solid " + S.bdr
+    }
+  }, rk.map(k => /*#__PURE__*/React.createElement("button", {
+    key: k,
+    onClick: () => setRound(k),
+    style: {
+      padding: "8px 10px",
+      border: "none",
+      cursor: "pointer",
+      whiteSpace: "nowrap",
+      background: "transparent",
+      color: round === k ? S.p : S.d,
+      fontSize: 11,
+      fontWeight: round === k ? 600 : 400,
+      borderBottom: round === k ? "2px solid " + S.gold : "2px solid transparent",
+      fontFamily: S.mono
+    }
+  }, lb[k]))), round === "R32" && /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "8px 0",
+      fontSize: 11,
+      color: S.m
+    }
+  }, tpi.comboValues ? /*#__PURE__*/React.createElement("span", null, "3rd-place combo: ", /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontFamily: S.mono,
+      color: S.gold
+    }
+  }, tpi.advGroups)) : /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: S.d
+    }
+  }, "Bracket auto-populates from group results")), cur.map(([mid, t1, t2]) => /*#__PURE__*/React.createElement(KOMatch, {
+    key: mid,
+    mid: mid,
+    t1: t1,
+    t2: t2,
+    koR: koR,
+    koS: koS,
+    onWin: onWin
+  })));
+}
+function PoolTab({
+  sp,
+  pp,
+  r32t,
+  matches
+}) {
+  const [exp, setExp] = useState(null);
+  const getTeams = pl => Object.entries(T).filter(([, t]) => t.o === pl).map(([c]) => {
+    let mp = 0;
+    matches.forEach(m => {
+      const [,, t1, s1, s2, t2] = m;
+      if (s1 === null) return;
+      if (t1 === c) mp += s1 > s2 ? 3 : s1 === s2 ? 1 : 0;
+      if (t2 === c) mp += s2 > s1 ? 3 : s1 === s2 ? 1 : 0;
+    });
+    const inR = r32t.has(c),
+      b = inR ? 3 : 0;
+    return {
+      code: c,
+      name: T[c].n,
+      flag: T[c].f,
+      group: T[c].g,
+      mp,
+      b,
+      total: mp + b,
+      inR
+    };
+  }).sort((a, b) => b.total - a.total);
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 16
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      fontWeight: 600,
+      color: S.m,
+      marginBottom: 12,
+      fontFamily: S.mono,
+      letterSpacing: 1
+    }
+  }, "POOL STANDINGS"), sp.map((p, i) => {
+    const isE = exp === p.name;
+    const teams = isE ? getTeams(p.name) : [];
+    return /*#__PURE__*/React.createElement("div", {
+      key: p.name,
+      style: {
+        marginBottom: 8
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      onClick: () => setExp(isE ? null : p.name),
+      style: {
+        background: S.card,
+        borderRadius: isE ? "6px 6px 0 0" : 6,
+        padding: "12px 14px",
+        cursor: "pointer",
+        borderLeft: "3px solid " + P_COLORS[p.name],
+        display: "flex",
+        alignItems: "center"
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 14,
+        fontWeight: 700,
+        color: S.d,
+        width: 20,
+        fontFamily: S.mono
+      }
+    }, i + 1), /*#__PURE__*/React.createElement("div", {
+      style: {
+        flex: 1
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 15,
+        fontWeight: 600,
+        color: S.p
+      }
+    }, p.name), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 11,
+        color: S.m,
+        marginTop: 2
+      }
+    }, [...r32t].filter(c => T[c].o === p.name).length, " teams in R32")), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 28,
+        fontWeight: 700,
+        fontFamily: S.mono,
+        color: P_COLORS[p.name]
+      }
+    }, p.pts), /*#__PURE__*/React.createElement("div", {
+      style: {
+        marginLeft: 8,
+        color: S.d,
+        fontSize: 12,
+        transform: isE ? "rotate(180deg)" : "none",
+        transition: "transform 0.2s"
+      }
+    }, "▼")), isE && /*#__PURE__*/React.createElement("div", {
+      style: {
+        background: "#111419",
+        borderRadius: "0 0 6px 6px",
+        borderLeft: "3px solid " + P_COLORS[p.name]
+      }
+    }, teams.map(t => /*#__PURE__*/React.createElement("div", {
+      key: t.code,
+      style: {
+        display: "flex",
+        alignItems: "center",
+        padding: "8px 14px",
+        borderTop: "1px solid " + S.bdr
+      }
+    }, /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 16,
+        marginRight: 8
+      }
+    }, t.flag), /*#__PURE__*/React.createElement("div", {
+      style: {
+        flex: 1,
+        minWidth: 0
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 12,
+        color: t.inR ? "#c5c9cf" : S.m,
+        fontWeight: t.inR ? 500 : 400
+      }
+    }, t.name), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 10,
+        color: S.d
+      }
+    }, "Grp ", t.group, " · ", t.mp, " match", t.b > 0 ? " + " + t.b + " R32" : "")), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 14,
+        fontWeight: 600,
+        fontFamily: S.mono,
+        color: t.total > 0 ? "#c5c9cf" : S.d
+      }
+    }, t.total)))));
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 24,
+      padding: 14,
+      background: S.card,
+      borderRadius: 6
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      fontWeight: 600,
+      color: S.m,
+      marginBottom: 8,
+      fontFamily: S.mono,
+      letterSpacing: 1
+    }
+  }, "SCORING"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "grid",
+      gridTemplateColumns: "1fr 1fr",
+      gap: "4px 16px",
+      fontSize: 12
+    }
+  }, [["Win", "3"], ["Draw", "1"], ["Loss", "0"], ["R32 qual", "3"], ["R16 qual", "5"], ["QF qual", "8"], ["SF qual", "12"], ["Final", "20"], ["Runner-up", "10"], ["3rd Place", "5"]].map(([k, v]) => /*#__PURE__*/React.createElement("div", {
+    key: k,
+    style: {
+      display: "flex",
+      justifyContent: "space-between",
+      color: S.m
+    }
+  }, /*#__PURE__*/React.createElement("span", null, k), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontFamily: S.mono,
+      color: S.s
+    }
+  }, v))))));
+}
+function App() {
+  const [tab, setTab] = useState("scores");
+  const [matches, setMatches] = useState(() => {
+    const d = loadData();
+    if (d?.scores) return INIT_MATCHES.map(m => {
+      const s = d.scores[m[0]];
+      return s ? [m[0], m[1], m[2], s[0], s[1], m[5], m[6], m[7]] : [...m];
+    });
+    return INIT_MATCHES.map(m => [...m]);
+  });
+  const [koR, setKoR] = useState(() => loadData()?.ko || {});
+  const [koS, setKoS] = useState(() => loadData()?.koScores || {});
+  const [editing, setEditing] = useState(null);
+  const [editS, setEditS] = useState([0, 0]);
+  const [gf, setGf] = useState(null);
+  const doSave = useCallback((m, ko, ks) => {
+    const sc = {};
+    m.forEach(x => {
+      if (x[3] !== null) sc[x[0]] = [x[3], x[4]];
+    });
+    saveData(sc, ko, ks);
+  }, []);
+  const standings = useMemo(() => calcStandings(matches), [matches]);
+  const tpi = useMemo(() => calc3rd(standings), [standings]);
+  const r32 = useMemo(() => calcR32(standings, tpi.comboValues), [standings, tpi]);
+  const r32t = useMemo(() => {
+    const q = new Set();
+    r32.forEach(([, a, b]) => {
+      if (a) q.add(a);
+      if (b) q.add(b);
+    });
+    return q;
+  }, [r32]);
+  const pp = useMemo(() => {
+    const pts = {
+      Kyle: 0,
+      Brent: 0,
+      Gavin: 0,
+      Brad: 0
+    };
+    matches.forEach(m => {
+      const [,, t1, s1, s2, t2] = m;
+      if (s1 === null) return;
+      if (s1 > s2) pts[T[t1].o] += 3;else if (s1 < s2) pts[T[t2].o] += 3;else {
+        pts[T[t1].o]++;
+        pts[T[t2].o]++;
+      }
+    });
+    r32t.forEach(c => {
+      if (T[c]) pts[T[c].o] += 3;
+    });
+    Object.entries(koR).forEach(([mid, w]) => {
+      if (!w || !T[w]) return;
+      let b = 0;
+      if (mid.startsWith("R32")) b = 5;else if (mid.startsWith("R16")) b = 8;else if (mid.startsWith("QF")) b = 12;else if (mid.startsWith("SF")) b = 20;
+      pts[T[w].o] += b;
+    });
+    Object.entries(koS).forEach(([, sc]) => {
+      if (!sc || sc[0] === null) return;
+      const [s1, s2, t1, t2] = sc;
+      if (!T[t1] || !T[t2]) return;
+      if (s1 > s2) pts[T[t1].o] += 3;else if (s2 > s1) pts[T[t2].o] += 3;else {
+        pts[T[t1].o]++;
+        pts[T[t2].o]++;
+      }
+    });
+    return pts;
+  }, [matches, r32t, koR, koS]);
+  const sp = useMemo(() => PLAYERS.map(p => ({
+    name: p,
+    pts: pp[p]
+  })).sort((a, b) => b.pts - a.pts), [pp]);
+  const saveScore = id => {
+    const nm = matches.map(m => m[0] === id ? [m[0], m[1], m[2], editS[0], editS[1], m[5], m[6], m[7]] : m);
+    setMatches(nm);
+    setEditing(null);
+    doSave(nm, koR, koS);
+  };
+  const koWin = (mid, w, s1, s2, t1, t2) => {
+    const nk = {
+      ...koR,
+      [mid]: w
+    };
+    const ns = {
+      ...koS,
+      [mid]: [s1, s2, t1, t2]
+    };
+    setKoR(nk);
+    setKoS(ns);
+    doSave(matches, nk, ns);
+  };
+  const mbd = useMemo(() => {
+    const g = {};
+    matches.forEach(m => {
+      if (!g[m[1]]) g[m[1]] = [];
+      g[m[1]].push(m);
+    });
+    return g;
+  }, [matches]);
+  const dord = useMemo(() => Object.keys(mbd).sort((a, b) => new Date("2026 " + a) - new Date("2026 " + b)), [mbd]);
+  const today = "Jun 26";
+  const rdates = useMemo(() => {
+    const i = dord.indexOf(today);
+    return i < 0 ? dord : [...dord.slice(i), ...dord.slice(0, i)];
+  }, [dord]);
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: S.bg,
+      minHeight: "100vh",
+      fontFamily: "'DM Sans',system-ui,sans-serif"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "16px 16px 0",
+      borderBottom: "1px solid #1e2228"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "baseline",
+      gap: 8,
+      marginBottom: 12
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontFamily: S.mono,
+      fontSize: 11,
+      color: S.m,
+      letterSpacing: 2,
+      textTransform: "uppercase"
+    }
+  }, "FIFA 2026"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 18,
+      fontWeight: 700,
+      color: S.p
+    }
+  }, "World Cup Bonanza")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      marginBottom: 12
+    }
+  }, sp.map((p, i) => /*#__PURE__*/React.createElement("div", {
+    key: p.name,
+    style: {
+      flex: 1,
+      textAlign: "center",
+      padding: "8px 4px",
+      borderLeft: i > 0 ? "1px solid #1e2228" : "none"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 22,
+      fontWeight: 700,
+      fontFamily: S.mono,
+      color: i === 0 ? P_COLORS[p.name] : S.p
+    }
+  }, p.pts), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      color: i === 0 ? P_COLORS[p.name] : S.m,
+      fontWeight: i === 0 ? 600 : 400,
+      marginTop: 2
+    }
+  }, p.name, i === 0 ? " ▲" : "")))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex"
+    }
+  }, [["scores", "Matches"], ["groups", "Groups"], ["bracket", "Bracket"], ["pool", "Pool"]].map(([k, l]) => /*#__PURE__*/React.createElement("button", {
+    key: k,
+    onClick: () => setTab(k),
+    style: {
+      flex: 1,
+      padding: "10px 0",
+      border: "none",
+      cursor: "pointer",
+      background: "transparent",
+      color: tab === k ? S.p : S.m,
+      fontSize: 13,
+      fontWeight: tab === k ? 600 : 400,
+      borderBottom: tab === k ? "2px solid " + S.gold : "2px solid transparent",
+      fontFamily: "inherit"
+    }
+  }, l)))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "0 16px 80px"
+    }
+  }, tab === "scores" && /*#__PURE__*/React.createElement("div", null, rdates.map(date => {
+    const ms = mbd[date];
+    const isTd = date === today;
+    return /*#__PURE__*/React.createElement("div", {
+      key: date,
+      style: {
+        marginTop: 20
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        display: "flex",
+        alignItems: "center",
+        gap: 8,
+        marginBottom: 8
+      }
+    }, /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 12,
+        fontWeight: 600,
+        color: isTd ? S.gold : S.m,
+        fontFamily: S.mono,
+        letterSpacing: 1
+      }
+    }, date.toUpperCase()), isTd && /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 10,
+        background: S.gold,
+        color: S.bg,
+        padding: "2px 6px",
+        borderRadius: 3,
+        fontWeight: 700
+      }
+    }, "TODAY")), ms.map(m => {
+      const [id,, t1, s1, s2, t2, gr] = m;
+      const tm1 = T[t1],
+        tm2 = T[t2],
+        pl = s1 !== null,
+        isEd = editing === id;
+      return /*#__PURE__*/React.createElement("div", {
+        key: id,
+        style: {
+          background: isEd ? "#1a1f27" : S.card,
+          borderRadius: 6,
+          marginBottom: 6,
+          border: isTd && !pl ? "1px solid #2a2520" : "1px solid " + S.bdr
+        }
+      }, /*#__PURE__*/React.createElement("div", {
+        style: {
+          display: "flex",
+          alignItems: "center",
+          padding: "10px 12px",
+          cursor: isEd ? "default" : "pointer"
+        },
+        onClick: !isEd ? () => {
+          setEditing(id);
+          setEditS([pl ? s1 : 0, pl ? s2 : 0]);
+        } : undefined
+      }, /*#__PURE__*/React.createElement("div", {
+        style: {
+          width: 22,
+          height: 22,
+          borderRadius: 3,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "#1e2228",
+          fontSize: 10,
+          fontWeight: 700,
+          color: S.m,
+          fontFamily: S.mono,
+          marginRight: 10,
+          flexShrink: 0
+        }
+      }, gr), /*#__PURE__*/React.createElement("div", {
+        style: {
+          flex: 1,
+          display: "flex",
+          alignItems: "center",
+          gap: 6
+        }
+      }, /*#__PURE__*/React.createElement("span", {
+        style: {
+          fontSize: 18
+        }
+      }, tm1.f), /*#__PURE__*/React.createElement("span", {
+        style: {
+          fontSize: 13,
+          fontWeight: pl && s1 > s2 ? 600 : 400,
+          color: pl && s1 > s2 ? S.p : pl ? S.s : "#c5c9cf"
+        }
+      }, t1)), isEd ? /*#__PURE__*/React.createElement("div", {
+        style: {
+          display: "flex",
+          alignItems: "center",
+          gap: 4
+        },
+        onClick: e => e.stopPropagation()
+      }, /*#__PURE__*/React.createElement("input", {
+        type: "number",
+        min: 0,
+        max: 20,
+        value: editS[0],
+        onChange: e => setEditS([parseInt(e.target.value) || 0, editS[1]]),
+        style: {
+          width: 36,
+          height: 32,
+          textAlign: "center",
+          background: "#252a33",
+          border: "1px solid #3a3f48",
+          borderRadius: 4,
+          color: S.p,
+          fontSize: 16,
+          fontWeight: 700,
+          fontFamily: S.mono
+        },
+        autoFocus: true
+      }), /*#__PURE__*/React.createElement("span", {
+        style: {
+          color: S.d
+        }
+      }, "–"), /*#__PURE__*/React.createElement("input", {
+        type: "number",
+        min: 0,
+        max: 20,
+        value: editS[1],
+        onChange: e => setEditS([editS[0], parseInt(e.target.value) || 0]),
+        style: {
+          width: 36,
+          height: 32,
+          textAlign: "center",
+          background: "#252a33",
+          border: "1px solid #3a3f48",
+          borderRadius: 4,
+          color: S.p,
+          fontSize: 16,
+          fontWeight: 700,
+          fontFamily: S.mono
+        }
+      })) : pl ? /*#__PURE__*/React.createElement("div", {
+        style: {
+          fontFamily: S.mono,
+          fontSize: 16,
+          fontWeight: 700,
+          color: S.p,
+          minWidth: 48,
+          textAlign: "center"
+        }
+      }, s1, " – ", s2) : /*#__PURE__*/React.createElement("div", {
+        style: {
+          fontSize: 11,
+          color: isTd ? S.gold : S.d,
+          fontFamily: S.mono,
+          minWidth: 48,
+          textAlign: "center"
+        }
+      }, "vs"), /*#__PURE__*/React.createElement("div", {
+        style: {
+          flex: 1,
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
+          justifyContent: "flex-end"
+        }
+      }, /*#__PURE__*/React.createElement("span", {
+        style: {
+          fontSize: 13,
+          fontWeight: pl && s2 > s1 ? 600 : 400,
+          color: pl && s2 > s1 ? S.p : pl ? S.s : "#c5c9cf"
+        }
+      }, t2), /*#__PURE__*/React.createElement("span", {
+        style: {
+          fontSize: 18
+        }
+      }, tm2.f))), isEd && /*#__PURE__*/React.createElement("div", {
+        style: {
+          display: "flex",
+          gap: 8,
+          padding: "0 12px 10px",
+          justifyContent: "flex-end"
+        }
+      }, /*#__PURE__*/React.createElement("button", {
+        onClick: () => setEditing(null),
+        style: {
+          padding: "6px 14px",
+          borderRadius: 4,
+          border: "1px solid #2a2f38",
+          background: "transparent",
+          color: S.s,
+          fontSize: 12,
+          cursor: "pointer",
+          fontFamily: "inherit"
+        }
+      }, "Cancel"), /*#__PURE__*/React.createElement("button", {
+        onClick: () => saveScore(id),
+        style: {
+          padding: "6px 14px",
+          borderRadius: 4,
+          border: "none",
+          background: S.gold,
+          color: S.bg,
+          fontSize: 12,
+          fontWeight: 600,
+          cursor: "pointer",
+          fontFamily: "inherit"
+        }
+      }, "Save")), pl && !isEd && /*#__PURE__*/React.createElement("div", {
+        style: {
+          display: "flex",
+          justifyContent: "space-between",
+          padding: "0 12px 6px"
+        }
+      }, /*#__PURE__*/React.createElement("div", {
+        style: {
+          width: 6,
+          height: 6,
+          borderRadius: "50%",
+          background: P_COLORS[tm1.o],
+          opacity: 0.6
+        }
+      }), /*#__PURE__*/React.createElement("div", {
+        style: {
+          width: 6,
+          height: 6,
+          borderRadius: "50%",
+          background: P_COLORS[tm2.o],
+          opacity: 0.6
+        }
+      })));
+    }));
+  })), tab === "groups" && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      flexWrap: "wrap",
+      gap: 4,
+      margin: "16px 0 8px"
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: () => setGf(null),
+    style: {
+      padding: "4px 10px",
+      borderRadius: 3,
+      border: "none",
+      cursor: "pointer",
+      background: !gf ? S.gold : "#1a1d22",
+      color: !gf ? S.bg : S.m,
+      fontSize: 11,
+      fontWeight: 600,
+      fontFamily: S.mono
+    }
+  }, "ALL"), GROUPS.map(g => /*#__PURE__*/React.createElement("button", {
+    key: g,
+    onClick: () => setGf(gf === g ? null : g),
+    style: {
+      padding: "4px 10px",
+      borderRadius: 3,
+      border: "none",
+      cursor: "pointer",
+      background: gf === g ? S.gold : "#1a1d22",
+      color: gf === g ? S.bg : S.m,
+      fontSize: 11,
+      fontWeight: 600,
+      fontFamily: S.mono
+    }
+  }, g))), (gf ? [gf] : GROUPS).map(group => {
+    const teams = standings[group];
+    return /*#__PURE__*/React.createElement("div", {
+      key: group,
+      style: {
+        marginTop: 16
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 12,
+        fontWeight: 600,
+        color: S.m,
+        marginBottom: 6,
+        fontFamily: S.mono,
+        letterSpacing: 1
+      }
+    }, "GROUP ", group), /*#__PURE__*/React.createElement("div", {
+      style: {
+        background: S.card,
+        borderRadius: 6,
+        overflow: "hidden"
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        display: "grid",
+        gridTemplateColumns: "1fr 28px 28px 28px 36px 36px",
+        padding: "6px 10px",
+        fontSize: 10,
+        color: S.d,
+        fontFamily: S.mono,
+        fontWeight: 700,
+        borderBottom: "1px solid " + S.bdr
+      }
+    }, /*#__PURE__*/React.createElement("span", null), /*#__PURE__*/React.createElement("span", {
+      style: {
+        textAlign: "center"
+      }
+    }, "W"), /*#__PURE__*/React.createElement("span", {
+      style: {
+        textAlign: "center"
+      }
+    }, "D"), /*#__PURE__*/React.createElement("span", {
+      style: {
+        textAlign: "center"
+      }
+    }, "L"), /*#__PURE__*/React.createElement("span", {
+      style: {
+        textAlign: "center"
+      }
+    }, "GD"), /*#__PURE__*/React.createElement("span", {
+      style: {
+        textAlign: "center"
+      }
+    }, "PTS")), teams.map((t, i) => {
+      const team = T[t.code];
+      const q = i < 2;
+      const th = i === 2 && tpi.advGroups.includes(group);
+      return /*#__PURE__*/React.createElement("div", {
+        key: t.code,
+        style: {
+          display: "grid",
+          gridTemplateColumns: "1fr 28px 28px 28px 36px 36px",
+          padding: "8px 10px",
+          alignItems: "center",
+          borderBottom: i < 3 ? "1px solid " + S.bdr : "none",
+          background: q ? "rgba(212,168,67,0.04)" : th ? "rgba(62,139,55,0.04)" : "transparent"
+        }
+      }, /*#__PURE__*/React.createElement("div", {
+        style: {
+          display: "flex",
+          alignItems: "center",
+          gap: 5,
+          minWidth: 0
+        }
+      }, /*#__PURE__*/React.createElement("span", {
+        style: {
+          fontSize: 10,
+          fontWeight: 700,
+          color: S.d,
+          width: 12,
+          fontFamily: S.mono
+        }
+      }, i + 1), /*#__PURE__*/React.createElement("span", {
+        style: {
+          fontSize: 15
+        }
+      }, team.f), /*#__PURE__*/React.createElement("span", {
+        style: {
+          fontSize: 12,
+          fontWeight: q ? 600 : 400,
+          color: q ? S.p : S.s,
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap"
+        }
+      }, team.n), /*#__PURE__*/React.createElement("span", {
+        style: {
+          width: 5,
+          height: 5,
+          borderRadius: "50%",
+          flexShrink: 0,
+          background: P_COLORS[team.o],
+          opacity: 0.5
+        }
+      })), /*#__PURE__*/React.createElement("span", {
+        style: {
+          textAlign: "center",
+          fontSize: 12,
+          fontFamily: S.mono,
+          color: t.w > 0 ? "#c5c9cf" : S.d
+        }
+      }, t.w), /*#__PURE__*/React.createElement("span", {
+        style: {
+          textAlign: "center",
+          fontSize: 12,
+          fontFamily: S.mono,
+          color: t.d > 0 ? "#c5c9cf" : S.d
+        }
+      }, t.d), /*#__PURE__*/React.createElement("span", {
+        style: {
+          textAlign: "center",
+          fontSize: 12,
+          fontFamily: S.mono,
+          color: t.l > 0 ? "#c5c9cf" : S.d
+        }
+      }, t.l), /*#__PURE__*/React.createElement("span", {
+        style: {
+          textAlign: "center",
+          fontSize: 12,
+          fontFamily: S.mono,
+          color: t.gd > 0 ? S.grn : t.gd < 0 ? S.red : S.d
+        }
+      }, t.gd > 0 ? "+" : "", t.gd), /*#__PURE__*/React.createElement("span", {
+        style: {
+          textAlign: "center",
+          fontSize: 14,
+          fontWeight: 700,
+          fontFamily: S.mono,
+          color: q ? S.gold : th ? S.grn : S.d
+        }
+      }, t.pts));
+    })));
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 20,
+      padding: 14,
+      background: S.card,
+      borderRadius: 6
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      fontWeight: 600,
+      color: S.m,
+      marginBottom: 8,
+      fontFamily: S.mono,
+      letterSpacing: 1
+    }
+  }, "3RD PLACE TABLE"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 10,
+      color: S.d,
+      marginBottom: 6,
+      fontFamily: S.mono
+    }
+  }, "Top 8 advance · Combo: ", tpi.advGroups || "TBD"), tpi.thirds.map((t, i) => {
+    const team = T[t.code];
+    const adv = i < 8;
+    return /*#__PURE__*/React.createElement("div", {
+      key: t.code,
+      style: {
+        display: "flex",
+        alignItems: "center",
+        padding: "5px 0",
+        opacity: adv ? 1 : 0.4,
+        borderTop: i === 8 ? "1px dashed #2a2f38" : "none"
+      }
+    }, /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 10,
+        fontWeight: 700,
+        color: adv ? S.gold : S.d,
+        width: 16,
+        fontFamily: S.mono
+      }
+    }, i + 1), /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 14,
+        marginRight: 6
+      }
+    }, team.f), /*#__PURE__*/React.createElement("span", {
+      style: {
+        flex: 1,
+        fontSize: 12,
+        color: adv ? "#c5c9cf" : S.m
+      }
+    }, team.n, " ", /*#__PURE__*/React.createElement("span", {
+      style: {
+        color: S.d,
+        fontSize: 10
+      }
+    }, "(", t.group, ")")), /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 11,
+        fontFamily: S.mono,
+        color: adv ? "#c5c9cf" : S.d,
+        width: 20,
+        textAlign: "right"
+      }
+    }, t.pts), /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 10,
+        fontFamily: S.mono,
+        color: t.gd > 0 ? S.grn : t.gd < 0 ? S.red : S.d,
+        width: 28,
+        textAlign: "right"
+      }
+    }, t.gd > 0 ? "+" : "", t.gd));
+  }))), tab === "bracket" && /*#__PURE__*/React.createElement(BracketTab, {
+    r32: r32,
+    koR: koR,
+    koS: koS,
+    onWin: koWin,
+    tpi: tpi
+  }), tab === "pool" && /*#__PURE__*/React.createElement(PoolTab, {
+    sp: sp,
+    pp: pp,
+    r32t: r32t,
+    matches: matches
+  })));
+}
+ReactDOM.createRoot(document.getElementById("root")).render(/*#__PURE__*/React.createElement(App, null));
+</script>
+<script>if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js").catch(()=>{});}</script>
+</body>
+</html>
